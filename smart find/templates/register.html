@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Smart Find – Admin Registration</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#060a0f;--surface:#0c1320;--border:#1a3050;--accent:#00d4ff;--accent2:#00ff88;--accent3:#ff4d6d;--text:#c8dff0;--muted:#4a6a88;--glow:0 0 20px rgba(0,212,255,0.4);--glow2:0 0 20px rgba(0,255,136,0.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Rajdhani",sans-serif;font-size:16px;min-height:100vh;overflow-x:hidden}
+#canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+body::before{content:"";position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);pointer-events:none;z-index:1}
+
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;position:relative;z-index:2}
+
+.box{background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:2.5rem 2.5rem;width:100%;max-width:440px;position:relative;overflow:hidden}
+.box::before{content:””;position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(–accent2),var(–accent))}
+
+.logo{text-align:center;margin-bottom:1.5rem}
+.logo-icon{width:56px;height:56px;border:2px solid var(–accent2);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;box-shadow:var(–glow2);position:relative;overflow:hidden;margin-bottom:.7rem}
+.logo-icon::before{content:””;position:absolute;width:200%;height:200%;background:conic-gradient(transparent,var(–accent2),transparent);animation:spin 3s linear infinite;top:-50%;left:-50%}
+.logo-icon::after{content:“SF”;position:absolute;color:var(–accent2);font-size:14px;font-family:“Orbitron”,monospace;font-weight:700;z-index:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo h1{font-family:“Orbitron”,monospace;font-size:1.3rem;font-weight:900;color:var(–accent2);text-shadow:var(–glow2);letter-spacing:.1em}
+.logo p{font-family:“Share Tech Mono”,monospace;font-size:.68rem;color:var(–muted);letter-spacing:.18em;text-transform:uppercase;margin-top:.25rem}
+
+.title{font-family:“Orbitron”,monospace;font-size:.82rem;color:#fff;letter-spacing:.1em;text-align:center;margin-bottom:1.5rem;padding-bottom:.9rem;border-bottom:1px solid var(–border)}
+
+.form-group{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1rem}
+.form-group label{font-family:“Share Tech Mono”,monospace;font-size:.7rem;color:var(–muted);letter-spacing:.12em;text-transform:uppercase}
+.form-group input,.form-group select{background:var(–bg);border:1px solid var(–border);border-radius:4px;color:var(–text);padding:.75rem 1rem;font-family:“Rajdhani”,sans-serif;font-size:1rem;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+.form-group input:focus,.form-group select:focus{border-color:var(–accent2);box-shadow:0 0 12px rgba(0,255,136,0.2)}
+.form-group select option{background:#0c1320}
+
+.btn{font-family:“Rajdhani”,sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.12em;text-transform:uppercase;padding:.75rem 2rem;border-radius:4px;border:none;cursor:pointer;transition:all .25s;width:100%;margin-top:1.25rem}
+.btn-register{background:var(–accent2);color:var(–bg);box-shadow:var(–glow2)}
+.btn-register:hover{box-shadow:0 0 30px rgba(0,255,136,.7);transform:translateY(-2px)}
+
+.msg{border-radius:4px;padding:.75rem 1rem;font-family:“Share Tech Mono”,monospace;font-size:.75rem;margin-top:1rem;text-align:center;display:none}
+.msg-error{background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);color:var(–accent3)}
+.msg-success{background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.3);color:var(–accent2)}
+
+.bottom-link{text-align:center;margin-top:1.25rem;font-family:“Share Tech Mono”,monospace;font-size:.72rem;color:var(–muted)}
+.bottom-link a{color:var(–accent);text-decoration:none}
+.bottom-link a:hover{text-decoration:underline}
+
+.strength-bar{height:4px;border-radius:2px;background:var(–border);margin-top:.4rem;overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;width:0;transition:width .3s,background .3s}
+</style>
+
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<div class="wrap">
+  <div class="box">
+
+```
+<div class="logo">
+  <div class="logo-icon"></div>
+  <h1>SMART FIND</h1>
+  <p>Turning Data Into Protection</p>
+</div>
+
+<div class="title">ADMIN REGISTRATION</div>
+
+<div class="form-group">
+  <label>Full Name *</label>
+  <input type="text" id="full_name" placeholder="Enter your full name"/>
+</div>
+
+<div class="form-group">
+  <label>Username *</label>
+  <input type="text" id="username" placeholder="Choose a username"/>
+</div>
+
+<div class="form-group">
+  <label>Password *</label>
+  <input type="password" id="password" placeholder="Min 6 characters" oninput="checkStrength(this.value)"/>
+  <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+</div>
+
+<div class="form-group">
+  <label>Confirm Password *</label>
+  <input type="password" id="confirm_password" placeholder="Re-enter password"/>
+</div>
+
+<div class="form-group">
+  <label>Role *</label>
+  <select id="role">
+    <option value="">Select your role</option>
+    <option value="police">Police Admin</option>
+    <option value="ngo">NGO Admin</option>
+  </select>
+</div>
+
+<button class="btn btn-register" onclick="doRegister()" id="reg-btn">REGISTER</button>
+
+<div class="msg msg-error" id="error-msg"></div>
+<div class="msg msg-success" id="success-msg"></div>
+
+<div class="bottom-link">
+  Already have an account? <a href="/login">Login here</a>
+</div>
+<div class="bottom-link" style="margin-top:.5rem;">
+  <a href="/">Back to main site</a>
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+// Canvas
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var W, H, particles = [];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize(); window.addEventListener("resize",resize);
+function Particle(){this.reset(true);}
+Particle.prototype.reset=function(init){this.x=Math.random()*W;this.y=init?Math.random()*H:H+5;this.size=Math.random()*1.5+0.3;this.speed=Math.random()*0.4+0.1;this.opacity=Math.random()*0.5+0.1;this.hue=Math.random()>0.7?160:195;};
+Particle.prototype.update=function(){this.y-=this.speed;if(this.y<-5)this.reset();};
+Particle.prototype.draw=function(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle="hsla("+this.hue+",100%,60%,"+this.opacity+")";ctx.fill();};
+for(var i=0;i<100;i++)particles.push(new Particle());
+function drawGrid(){ctx.strokeStyle="rgba(0,212,255,0.025)";ctx.lineWidth=1;var s=60;for(var x=0;x<W;x+=s){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(var y=0;y<H;y+=s){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}}
+function animate(){ctx.clearRect(0,0,W,H);drawGrid();particles.forEach(function(p){p.update();p.draw();});requestAnimationFrame(animate);}
+animate();
+
+// Password strength
+function checkStrength(val) {
+  var fill = document.getElementById("strength-fill");
+  var len = val.length;
+  if(len === 0){ fill.style.width="0%"; fill.style.background="#1a3050"; return; }
+  if(len < 6){ fill.style.width="30%"; fill.style.background="#ff4d6d"; return; }
+  if(len < 10){ fill.style.width="65%"; fill.style.background="#ffb400"; return; }
+  fill.style.width="100%"; fill.style.background="#00ff88";
+}
+
+// Register
+async function doRegister() {
+  var full_name        = document.getElementById("full_name").value.trim();
+  var username         = document.getElementById("username").value.trim();
+  var password         = document.getElementById("password").value.trim();
+  var confirm_password = document.getElementById("confirm_password").value.trim();
+  var role             = document.getElementById("role").value;
+  var btn              = document.getElementById("reg-btn");
+  var err              = document.getElementById("error-msg");
+  var suc              = document.getElementById("success-msg");
+
+  err.style.display = "none";
+  suc.style.display = "none";
+
+  if(!full_name || !username || !password || !confirm_password || !role) {
+    err.textContent = "All fields are required"; err.style.display = "block"; return;
+  }
+  if(password !== confirm_password) {
+    err.textContent = "Passwords do not match"; err.style.display = "block"; return;
+  }
+  if(password.length < 6) {
+    err.textContent = "Password must be at least 6 characters"; err.style.display = "block"; return;
+  }
+
+  btn.textContent = "REGISTERING..."; btn.disabled = true;
+
+  try {
+    var res  = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ full_name, username, password, role })
+    });
+    var data = await res.json();
+
+    if(data.success) {
+      suc.textContent = "Registration successful! Redirecting to login...";
+      suc.style.display = "block";
+      btn.textContent = "SUCCESS!";
+      setTimeout(function(){ window.location.href = "/login"; }, 2000);
+    } else {
+      err.textContent = data.error;
+      err.style.display = "block";
+      btn.textContent = "REGISTER";
+      btn.disabled = false;
+    }
+  } catch(e) {
+    err.textContent = "Cannot connect to server";
+    err.style.display = "block";
+    btn.textContent = "REGISTER";
+    btn.disabled = false;
+  }
+}
+</script>
+
+</body>
+</html>

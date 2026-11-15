@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Smart Find – Admin Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#060a0f;--surface:#0c1320;--border:#1a3050;--accent:#00d4ff;--accent2:#00ff88;--accent3:#ff4d6d;--text:#c8dff0;--muted:#4a6a88;--glow:0 0 20px rgba(0,212,255,0.4);--glow2:0 0 20px rgba(0,255,136,0.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Rajdhani",sans-serif;font-size:16px;min-height:100vh;overflow-x:hidden}
+#canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+body::before{content:"";position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);pointer-events:none;z-index:1}
+
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;position:relative;z-index:2}
+
+.login-box{background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:3rem 2.5rem;width:100%;max-width:420px;position:relative;overflow:hidden}
+.login-box::before{content:””;position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(–accent),var(–accent2))}
+
+.login-logo{text-align:center;margin-bottom:2rem}
+.login-icon{width:60px;height:60px;border:2px solid var(–accent);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;box-shadow:var(–glow);position:relative;overflow:hidden;margin-bottom:.8rem}
+.login-icon::before{content:””;position:absolute;width:200%;height:200%;background:conic-gradient(transparent,var(–accent),transparent);animation:spin 3s linear infinite;top:-50%;left:-50%}
+.login-icon::after{content:“SF”;position:absolute;color:var(–accent);font-size:14px;font-family:“Orbitron”,monospace;font-weight:700;z-index:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.login-logo h1{font-family:“Orbitron”,monospace;font-size:1.4rem;font-weight:900;color:var(–accent);text-shadow:var(–glow);letter-spacing:.1em}
+.login-logo p{font-family:“Share Tech Mono”,monospace;font-size:.7rem;color:var(–muted);letter-spacing:.2em;text-transform:uppercase;margin-top:.3rem}
+
+.login-title{font-family:“Orbitron”,monospace;font-size:.85rem;color:#fff;letter-spacing:.1em;text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(–border)}
+
+.role-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem}
+.role-tab{flex:1;padding:.6rem;border-radius:4px;border:1px solid var(–border);background:transparent;color:#ffffff;font-family:“Rajdhani”,sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:center}
+.role-tab.active{background:rgba(0,212,255,0.1);border-color:var(–accent);color:var(–accent);box-shadow:var(–glow)}
+
+.login-hint{background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.15);border-radius:4px;padding:.75rem 1rem;margin-bottom:1.5rem;font-family:“Share Tech Mono”,monospace;font-size:.72rem;color:var(–muted);line-height:1.6}
+.login-hint span{color:var(–accent2)}
+
+.form-group{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem}
+.form-group label{font-family:“Share Tech Mono”,monospace;font-size:.72rem;color:var(–muted);letter-spacing:.12em;text-transform:uppercase}
+.form-group input{background:var(–bg);border:1px solid var(–border);border-radius:4px;color:var(–text);padding:.8rem 1rem;font-family:“Rajdhani”,sans-serif;font-size:1rem;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+.form-group input:focus{border-color:var(–accent);box-shadow:0 0 12px rgba(0,212,255,0.2)}
+
+.btn{font-family:“Rajdhani”,sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.12em;text-transform:uppercase;padding:.75rem 2rem;border-radius:4px;border:none;cursor:pointer;transition:all .25s}
+.btn-primary{background:var(–accent);color:var(–bg);box-shadow:var(–glow)}
+.btn-primary:hover{box-shadow:0 0 30px rgba(0,212,255,.7);transform:translateY(-2px)}
+.btn-login{width:100%;margin-top:1.5rem;padding:.9rem;font-size:1rem;letter-spacing:.15em}
+
+.error-msg{background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);border-radius:4px;padding:.75rem 1rem;font-family:“Share Tech Mono”,monospace;font-size:.75rem;color:var(–accent3);margin-top:1rem;display:none;text-align:center}
+
+.back-link{display:block;text-align:center;margin-top:1.5rem;font-family:“Share Tech Mono”,monospace;font-size:.72rem;color:var(–muted);text-decoration:none;letter-spacing:.1em;transition:color .2s}
+.back-link:hover{color:var(–accent2)}
+
+#toast{position:fixed;bottom:2rem;right:2rem;background:#101a2a;border:1px solid var(–accent2);border-radius:6px;padding:1rem 1.5rem;font-family:“Share Tech Mono”,monospace;font-size:.8rem;color:var(–accent2);box-shadow:var(–glow2);transform:translateY(4rem);opacity:0;transition:.4s cubic-bezier(.34,1.56,.64,1);z-index:999;max-width:320px}
+#toast.show{transform:translateY(0);opacity:1}
+</style>
+
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<div class="login-wrap">
+  <div class="login-box">
+
+```
+<div class="login-logo">
+  <div class="login-icon"></div>
+  <h1>SMART FIND</h1>
+  <p>Turning Data Into Protection</p>
+</div>
+
+<div class="login-title">ADMIN LOGIN PORTAL</div>
+
+<div class="role-tabs">
+  <button class="role-tab active" onclick="setRole('police',this)">Police Admin</button>
+  <button class="role-tab" onclick="setRole('ngo',this)">NGO Admin</button>
+</div>
+
+<div class="login-hint" id="hint-box">
+  <span>Police Admin:</span> username: <span>police_admin</span> / password: <span>police123</span>
+</div>
+
+<div class="form-group">
+  <label>Username</label>
+  <input type="text" id="username" placeholder="Enter your username" autocomplete="username"/>
+</div>
+
+<div class="form-group">
+  <label>Password</label>
+  <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+</div>
+
+<button class="btn btn-primary btn-login" onclick="doLogin()" id="login-btn">LOGIN</button>
+
+<div class="error-msg" id="error-msg"></div>
+
+<div style="text-align:center;margin-top:.75rem;font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--muted);">New admin? <a href="/register" style="color:var(--accent2);text-decoration:none;">Register here</a></div>
+<a href="/" class="back-link">Back to main site</a>
+```
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// Canvas
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var W, H, particles = [];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();
+window.addEventListener("resize",resize);
+function Particle(){this.reset(true);}
+Particle.prototype.reset=function(init){this.x=Math.random()*W;this.y=init?Math.random()*H:H+5;this.size=Math.random()*1.5+0.3;this.speed=Math.random()*0.4+0.1;this.opacity=Math.random()*0.5+0.1;this.hue=Math.random()>0.7?160:195;};
+Particle.prototype.update=function(){this.y-=this.speed;if(this.y<-5)this.reset();};
+Particle.prototype.draw=function(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle="hsla("+this.hue+",100%,60%,"+this.opacity+")";ctx.fill();};
+for(var i=0;i<120;i++)particles.push(new Particle());
+function drawGrid(){ctx.strokeStyle="rgba(0,212,255,0.025)";ctx.lineWidth=1;var s=60;for(var x=0;x<W;x+=s){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(var y=0;y<H;y+=s){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}}
+function animate(){ctx.clearRect(0,0,W,H);drawGrid();particles.forEach(function(p){p.update();p.draw();});requestAnimationFrame(animate);}
+animate();
+
+// Role switch
+function setRole(role, btn) {
+  document.querySelectorAll(".role-tab").forEach(function(b){b.classList.remove("active");});
+  btn.classList.add("active");
+  var hint = document.getElementById("hint-box");
+  if(role === "police") {
+    document.getElementById("username").value = "police_admin";
+    hint.innerHTML = "<span>Police Admin:</span> username: <span>police_admin</span> / password: <span>police123</span>";
+  } else {
+    document.getElementById("username").value = "ngo_admin";
+    hint.innerHTML = "<span>NGO Admin:</span> username: <span>ngo_admin</span> / password: <span>ngo123</span>";
+  }
+  document.getElementById("password").value = "";
+  document.getElementById("password").focus();
+}
+
+// Login
+async function doLogin() {
+  var username = document.getElementById("username").value.trim();
+  var password = document.getElementById("password").value.trim();
+  var btn = document.getElementById("login-btn");
+  var err = document.getElementById("error-msg");
+  err.style.display = "none";
+  if(!username || !password){err.textContent = "Please enter username and password";err.style.display = "block";return;}
+  btn.textContent = "AUTHENTICATING...";btn.disabled = true;
+  try {
+    var res = await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:username,password:password})});
+    var data = await res.json();
+    if(data.success){btn.textContent = "ACCESS GRANTED";setTimeout(function(){window.location.href="/";},600);}
+    else{err.textContent = data.error;err.style.display="block";btn.textContent="LOGIN";btn.disabled=false;}
+  } catch(e){err.textContent="Cannot connect to server";err.style.display="block";btn.textContent="LOGIN";btn.disabled=false;}
+}
+</script>
+
+</body>
+</html>
